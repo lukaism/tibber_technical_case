@@ -1,0 +1,22 @@
+services:
+  test:
+    environment:
+      - DATABASE_URL="${DATABASE_URL}"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m unittest discover -s /tests -p 'test_*.py'
+    volumes:
+      - .:/code
+      - ./tests:/tests
+
+  app:
+    environment:
+      - DATABASE_URL="${DATABASE_URL}"
+    build: .
+    container_name: tibber_technical_case
+    command: python3 -m flask run --host=0.0.0.0 --reload
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/code
