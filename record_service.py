@@ -70,10 +70,10 @@ def insert_record(cursor, record: ExecutionResult):
 def verify_insertion(cursor):
     inserted_row = cursor.fetchone()
     if inserted_row:
-        id, time_of_insertion, commands, result, duration = inserted_row
+        id, timestamp, commands, result, duration = inserted_row
         return {
             "id": id,
-            "TimeOfInsertion": time_of_insertion,
+            "Timestamp": timestamp,
             "Commands": commands,
             "Result": result,
             "Duration": duration,

@@ -1,8 +1,11 @@
 import unittest
+from custom_types import Coordinates, Command, CommandsList
 from robot_service import (
     parse_body_instruct_robot_generate_response,
     parse_body,
     execute_robot_instructions,
+    move_robot,
+    update_position,
 )
 
 
@@ -30,9 +33,7 @@ class TestRobotMovement(unittest.TestCase):
 
         result = execute_robot_instructions(start_position, commands)
 
-        self.assertEqual(
-            result, 4
-        )  # Assuming the robot will visit four unique positions
+        self.assertEqual(result, 4)
 
     def test_parse_body_instruct_robot_generate_response(self):
         body = {
@@ -50,7 +51,7 @@ class TestRobotMovement(unittest.TestCase):
         self.assertIn("result", response)
         self.assertIn("commands", response)
 
-    def test_move_robot_1(self):
+    def test_parse_and_instruct_robot_1(self):
         JSON_BODY = {
             "start": {"x": 10, "y": 22},
             "commands": [
@@ -63,7 +64,7 @@ class TestRobotMovement(unittest.TestCase):
             parse_body_instruct_robot_generate_response(JSON_BODY)["result"], 4
         )
 
-    def test_move_robot_1_and_return(self):
+    def test_parse_and_instruct_robot_back_to_start(self):
         JSON_BODY = {
             "start": {"x": 10, "y": 22},
             "commands": [
@@ -93,7 +94,7 @@ class TestRobotMovement(unittest.TestCase):
             parse_body_instruct_robot_generate_response(JSON_BODY)["result"], 15
         )
 
-    def test_move_robot_long_distance(self):
+    def test_parse_and_instruct_robot_long_distance(self):
         JSON_BODY = {
             "start": {"x": 10, "y": 22},
             "commands": [
@@ -111,6 +112,46 @@ class TestRobotMovement(unittest.TestCase):
         self.assertEqual(
             parse_body_instruct_robot_generate_response(JSON_BODY)["result"], 300005
         )
+
+    def test_move_robot(self):
+        visited_vertices = set()
+        current_position: Coordinates = [0, 0]
+        command: Command = {"direction": "north", "steps": 1}
+        move_robot(visited_vertices, current_position, command)
+
+        self.assertIn((0, 1), visited_vertices)
+
+    def test_move_robot_error(self):
+        visited_vertices = set()
+        current_position: Coordinates = [0, 0]
+        command: Command = {"direction": "north", "steps": 1}
+        move_robot(visited_vertices, current_position, command)
+
+        self.assertNotIn((0, 2), visited_vertices)
+
+    def test_update_position_north(self):
+        current_position: Coordinates = [0, 2]
+        direction: Coordinates = [0, 1]
+
+        self.assertEqual(update_position(current_position, direction), [0, 3])
+
+    def test_update_position_south(self):
+        current_position: Coordinates = [0, 2]
+        direction: Coordinates = [0, -1]
+
+        self.assertEqual(update_position(current_position, direction), [0, 1])
+
+    def test_update_position_east(self):
+        current_position: Coordinates = [0, 2]
+        direction: Coordinates = [1, 0]
+
+        self.assertEqual(update_position(current_position, direction), [1, 2])
+
+    def test_update_position_west(self):
+        current_position: Coordinates = [0, 2]
+        direction: Coordinates = [-1, 0]
+
+        self.assertEqual(update_position(current_position, direction), [-1, 2])
 
 
 if __name__ == "__main__":
