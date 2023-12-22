@@ -19,7 +19,7 @@ To run the code inside a Docker container, use the following steps:
 1. Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/your-username/your-project.
+git clone https://github.com/lukaism/tibber_technical_case.git
 ```
 
 2. Navigate to the project directory:
@@ -31,9 +31,9 @@ cd tibber_tecnical_case
 ```bash
 docker-compose up
 ```
-    This will build the necessary images and start the application. You can access the application at http://localhost:5000.
+This will build the necessary images and start the application. You can access the application at http://localhost:5000.
 
-    note: This will execute the tests on  aswell to check everything is in order.
+note: This will execute the tests on  aswell to check everything is in order.
     
 4. From this point you should be able to interact with the endpoint locally using a tool such as postman:
 
