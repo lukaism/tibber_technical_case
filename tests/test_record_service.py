@@ -1,20 +1,17 @@
 import unittest
 import psycopg2
 import os
-from unittest.mock import MagicMock
+from utils import parse_env_variable
 from record_service import (
     save_result,
-    create_record_table,
-    return_error,
-    insert_record,
+    try_insert_record,
     verify_insertion,
 )
 
 
 def deleteInsertedRecord(id: int):
     url = os.getenv("DATABASE_URL")
-    url = url.replace("'", "")
-    url = url.replace('"', "")
+    url = parse_env_variable(url)
 
     connection = psycopg2.connect(url)
     with connection as connection:
@@ -25,47 +22,65 @@ def deleteInsertedRecord(id: int):
 
 
 class TestYourModule(unittest.TestCase):
-    def setUp(self):
-        # Create a mock for the psycopg2 connection
-        self.mock_connection = MagicMock()
-        self.mock_cursor = self.mock_connection.cursor.return_value
-
     def test_save_result_success(self):
-        # Mock the psycopg2.connect method
-        with unittest.mock.patch("psycopg2.connect", return_value=self.mock_connection):
-            record = {
-                "timestamp": "2023-01-01 12:00:00",
-                "commands": 11,
-                "result": 1,
-                "duration": 2.5,
-            }
-            self.mock_cursor.fetchone.return_value = (
-                1,
-                "2023-01-01 12:00:00",
-                10,
-                1,
-                2.5,
-            )
-
-            result = save_result(record)
+        record = {
+            "timestamp": "2023-01-01 12:00:00",
+            "commands": 11,
+            "result": 1,
+            "duration": 2.5,
+        }
+        result = save_result(record)
 
         id = result[0]["id"]
         deleteInsertedRecord(id)
-        self.assertEqual(result[1], 201)  # Check status code
-        self.assertIn("id", result[0])  # Check if id is present in the response
+        self.assertEqual(result[1], 201)
+        self.assertIn("id", result[0])
 
     def test_save_result_table_creation_failure(self):
-        with unittest.mock.patch("psycopg2.connect", return_value=self.mock_connection):
-            self.mock_cursor.execute.side_effect = Exception("Table creation error")
-            record = {
-                "commands": 10,
-                "result": 1,
-                "duration": 2.5,
-            }
+        record = {
+            "commands": 10,
+            "result": 1,
+            "duration": 2.5,
+        }
 
-            result = save_result(record)
+        result = save_result(record)
+        self.assertEqual(result[1], 500)
 
-        self.assertEqual(result[1], 500)  # Check status code
+    def test_insert_record_correct(self):
+        url = os.getenv("DATABASE_URL")
+        url = parse_env_variable(url)
+
+        record = {
+            "timestamp": "2023-01-01 12:00:00",
+            "commands": 11,
+            "result": 1,
+            "duration": 2.5,
+        }
+        connection = psycopg2.connect(url)
+        with connection as connection:
+            with connection.cursor() as cursor:
+                try_insert_record(cursor, record)
+                result = verify_insertion(cursor)
+
+        id = result[0]["id"]
+        deleteInsertedRecord(id)
+        self.assertEqual(result[1], 201)
+
+    def test_insert_record_error(self):
+        url = os.getenv("DATABASE_URL")
+        url = parse_env_variable(url)
+
+        record = {
+            "timestamp": "2023-01-01 12:00:00",
+            "result": 1,
+            "duration": 2.5,
+        }
+        connection = psycopg2.connect(url)
+        with connection as connection:
+            with connection.cursor() as cursor:
+                result = try_insert_record(cursor, record)
+
+        self.assertEqual(result[1], 500)
 
 
 if __name__ == "__main__":

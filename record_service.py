@@ -1,11 +1,11 @@
 import psycopg2
 import os
 from custom_types import ExecutionResult
+from utils import parse_env_variable
 
 
 url = os.getenv("DATABASE_URL")
-url = url.replace("'", "")
-url = url.replace('"', "")
+url = parse_env_variable(url)
 
 connection = psycopg2.connect(url)
 
@@ -30,25 +30,33 @@ def save_result(record: ExecutionResult):
     try:
         with connection:
             with connection.cursor() as cursor:
-                try:
-                    create_record_table(cursor)
-                except Exception as e:
-                    return return_error(e)
-                try:
-                    insert_record(cursor, record)
-                except Exception as e:
-                    return return_error(e)
+                try_create_record_table(cursor)
+                try_insert_record(cursor, record)
 
                 response = verify_insertion(cursor)
                 return response
 
     except Exception as e:
         print(f"Error: {e}")
-        return {"message": f"Error: {e}"}, 500
+        return {"message": f"There was an error inserting the record: {e}"}, 500
 
 
 def create_record_table(cursor):
     cursor.execute(CREATE_RECORD_TABLE)
+
+
+def try_create_record_table(cursor):
+    try:
+        create_record_table(cursor)
+    except Exception as e:
+        return return_error(e)
+
+
+def try_insert_record(cursor, record: ExecutionResult):
+    try:
+        insert_record(cursor, record)
+    except Exception as e:
+        return return_error(e)
 
 
 def return_error(e: Exception):
