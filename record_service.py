@@ -37,7 +37,6 @@ def save_result(record: ExecutionResult):
                 return response
 
     except Exception as e:
-        print(f"Error: {e}")
         return {"message": f"There was an error inserting the record: {e}"}, 500
 
 
