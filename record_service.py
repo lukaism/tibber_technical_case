@@ -58,10 +58,6 @@ def try_insert_record(cursor, record: ExecutionResult):
         raise Exception(e) from None
 
 
-def return_error(e: Exception):
-    return {"message": f"Error: {e}"}, 500
-
-
 def insert_record(cursor, record: ExecutionResult):
     cursor.execute(
         INSERT_RECORD,
@@ -87,4 +83,4 @@ def verify_insertion(cursor):
             "message": "Record inserted successfully.",
         }, 201
     else:
-        return {"message": "Oops! Something went wrong during insertion."}, 500
+        raise Exception("Oops! Something went wrong during insertion.") from None

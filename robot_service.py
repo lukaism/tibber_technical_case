@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, Union
+from typing import Dict, Tuple, Union
 import time
 from datetime import datetime
 from custom_types import Coordinates, Command, CommandsList, ExecutionResult
