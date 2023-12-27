@@ -23,28 +23,23 @@ INCORRECT_RECORD = {
 }
 
 
-def deleteInsertedRecord(id: int):
-    url = os.getenv("DATABASE_URL")
-    url = parse_env_variable(url)
-
-    connection = psycopg2.connect(url)
-    with connection as connection:
-        with connection.cursor() as cursor:
-            delete_query = "DELETE FROM records WHERE id = %s;"
-            cursor.execute(delete_query, (id,))
-
-
 class TestYourModule(unittest.TestCase):
     def setUp(self) -> None:
         url = os.getenv("DATABASE_URL")
         self.url = parse_env_variable(url)
         self.connection = psycopg2.connect(self.url)
 
+    def deleteInsertedRecord(self, id: int) -> None:
+        with self.connection as connection:
+            with connection.cursor() as cursor:
+                delete_query = "DELETE FROM records WHERE id = %s;"
+                cursor.execute(delete_query, (id,))
+
     def test_save_result_success(self):
         result = save_result(CORRECT_RECORD)
 
         id = result[0]["id"]
-        deleteInsertedRecord(id)
+        self.deleteInsertedRecord(id)
         self.assertEqual(result[1], 201)
         self.assertIn("id", result[0])
 
@@ -62,7 +57,7 @@ class TestYourModule(unittest.TestCase):
                 result = verify_insertion(cursor)
 
         id = result[0]["id"]
-        deleteInsertedRecord(id)
+        self.deleteInsertedRecord(id)
         self.assertEqual(result[1], 201)
 
     def test_insert_record_error(self):
