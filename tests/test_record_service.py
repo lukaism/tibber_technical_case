@@ -4,6 +4,7 @@ import os
 from utils import parse_env_variable
 from record_service import (
     save_result,
+    try_create_record_table,
     try_insert_record,
     verify_insertion,
 )
@@ -56,6 +57,7 @@ class TestYourModule(unittest.TestCase):
     def test_insert_record_correct(self):
         with self.connection as connection:
             with connection.cursor() as cursor:
+                try_create_record_table(cursor)
                 try_insert_record(cursor, CORRECT_RECORD)
                 result = verify_insertion(cursor)
 
