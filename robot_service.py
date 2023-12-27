@@ -12,6 +12,13 @@ DIRECTION_CHANGES: Dict[str, Coordinates] = {
 }
 
 
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """
+This Python code directs a robot to explore a grid, recording unique positions stored as tuples. It tracks time and reports the total number of visited locations. 
+
+The method names aim to be self-explanatory, minimizing the need for unnecessary comments.
+""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+
+
 def parse_body_instruct_robot_generate_response(
     body: Dict[str, Union[Coordinates, CommandsList]]
 ) -> ExecutionResult:
@@ -37,7 +44,9 @@ def parse_body(
     return commands, start_position
 
 
-def instruct_robot_and_time_it(start_position: Coordinates, commands: CommandsList):
+def instruct_robot_and_time_it(
+    start_position: Coordinates, commands: CommandsList
+) -> Tuple[int, float]:
     start_time = time.perf_counter()
     result = execute_robot_instructions(start_position, commands)
     end_time = time.perf_counter()
