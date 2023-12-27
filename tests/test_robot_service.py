@@ -1,5 +1,5 @@
 import unittest
-from custom_types import Coordinates, Command, CommandsList
+from custom_types import Coordinates, Command
 from robot_service import (
     parse_body_instruct_robot_generate_response,
     parse_body,
@@ -79,7 +79,7 @@ class TestRobotMovement(unittest.TestCase):
             parse_body_instruct_robot_generate_response(JSON_BODY)["result"], 4
         )
 
-    def test_move_robot_2(self):
+    def test_move_robot_farther(self):
         JSON_BODY = {
             "start": {"x": 10, "y": 22},
             "commands": [
@@ -114,20 +114,32 @@ class TestRobotMovement(unittest.TestCase):
         )
 
     def test_move_robot(self):
+        ## Here we test to ensure corerct spaces are counted as visited
         visited_vertices = set()
         current_position: Coordinates = [0, 0]
-        command: Command = {"direction": "north", "steps": 1}
+        command: Command = {"direction": "north", "steps": 2}
         move_robot(visited_vertices, current_position, command)
 
         self.assertIn((0, 1), visited_vertices)
+        self.assertIn((0, 2), visited_vertices)
 
-    def test_move_robot_error(self):
+    def test_move_robot_unvisited_spaces(self):
+        ## Here we test to ensure no incorerct spaces are counted as visited
         visited_vertices = set()
         current_position: Coordinates = [0, 0]
         command: Command = {"direction": "north", "steps": 1}
         move_robot(visited_vertices, current_position, command)
 
         self.assertNotIn((0, 2), visited_vertices)
+        self.assertNotIn((0, -1), visited_vertices)
+        self.assertNotIn((1, 0), visited_vertices)
+        self.assertNotIn((1, 1), visited_vertices)
+        self.assertNotIn((1, -1), visited_vertices)
+        self.assertNotIn((-1, 0), visited_vertices)
+        self.assertNotIn((-1, -1), visited_vertices)
+        self.assertNotIn((-1, 1), visited_vertices)
+
+        self.assertIn((0, 1), visited_vertices)
 
     def test_update_position_north(self):
         current_position: Coordinates = [0, 2]

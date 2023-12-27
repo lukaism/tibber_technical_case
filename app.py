@@ -19,12 +19,12 @@ def main():
         try:
             response = save_result(result)
         except Exception as e:
+            message = {
+                "error": "There was a problem inserting the record into the database: "
+                f"{e}"
+            }
             return (
-                jsonify(
-                    {
-                        "error": "There was a problem inserting the record into the database.{e}"
-                    }
-                ),
+                message,
                 500,
             )
         return jsonify(response), 201

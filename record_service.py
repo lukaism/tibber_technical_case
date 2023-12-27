@@ -37,7 +37,7 @@ def save_result(record: ExecutionResult):
                 return response
 
     except Exception as e:
-        return {"message": f"There was an error inserting the record: {e}"}, 500
+        raise Exception(e) from None
 
 
 def create_record_table(cursor):
@@ -48,14 +48,14 @@ def try_create_record_table(cursor):
     try:
         create_record_table(cursor)
     except Exception as e:
-        return return_error(e)
+        raise Exception(e) from None
 
 
 def try_insert_record(cursor, record: ExecutionResult):
     try:
         insert_record(cursor, record)
     except Exception as e:
-        return return_error(e)
+        raise Exception(e) from None
 
 
 def return_error(e: Exception):
