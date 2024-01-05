@@ -113,7 +113,7 @@ class TestRobotMovement(unittest.TestCase):
             parse_body_instruct_robot_generate_response(JSON_BODY)["result"], 300005
         )
 
-    def test_move_robot(self):
+    def test_move_robot_records_correct_vertices(self):
         ## Here we test to ensure corerct spaces are counted as visited
         visited_vertices = set()
         current_position: Coordinates = [0, 0]

@@ -11,17 +11,36 @@ DIRECTION_CHANGES: Dict[str, Coordinates] = {
     "south": [0, -1],
 }
 
-
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """
+"""
 This Python code directs a robot to explore a grid, recording unique positions stored as tuples. It tracks time and reports the total number of visited locations. 
-
-The method names aim to be self-explanatory, minimizing the need for unnecessary comments.
-""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+"""
 
 
 def parse_body_instruct_robot_generate_response(
     body: Dict[str, Union[Coordinates, CommandsList]]
 ) -> ExecutionResult:
+    """
+    Parses the input body, instructs a robot with commands, and generates a response.
+
+    Args:
+        body (Dict[str, Union[Coordinates, CommandsList]]): The input body containing
+            the starting position and a list of commands for the robot.
+
+    Returns:
+        ExecutionResult: A dictionary containing the timestamp, duration of execution,
+            result (total number of visited locations), and the number of commands.
+
+    Example:
+    >>> parse_body_instruct_robot_generate_response({
+    ...     "start": {"x": 0, "y": 0},
+    ...     "commands": [
+    ...         {"direction": "east", "steps": 2},
+    ...         {"direction": "north", "steps": 1},
+    ...     ],
+    ... })
+    {'timestamp': '2024-01-05T00:00:00', 'duration': 0.0, 'result': 4, 'commands': 2}
+    """
+
     commands, start_position = parse_body(body)
     result, elapsed_time = instruct_robot_and_time_it(start_position, commands)
 
@@ -58,6 +77,21 @@ def instruct_robot_and_time_it(
 def execute_robot_instructions(
     start_position: Coordinates, commands: CommandsList
 ) -> int:
+    """
+    Executes the given commands and returns the total number of visited locations using a set as we just have to measure unique visited positions.
+
+    Args:
+        start_position (Coordinates): The starting position of the robot.
+        commands (CommandsList): A list of commands for the robot.
+
+    Returns:
+        int: The total number of visited locations.
+
+    Example:
+    >>> execute_robot_instructions([0, 0], [{"direction": "east", "steps": 2}])
+    3
+    """
+
     visited_vertices = set()
     visited_vertices.add(tuple(start_position))
     current_position = start_position
@@ -80,7 +114,23 @@ def move_robot(
 def update_position(
     current_position: Coordinates, direction: Coordinates
 ) -> Coordinates:
-    current_position[0] = current_position[0] + direction[0]
-    current_position[1] = current_position[1] + direction[1]
+    """
+    Updates the current position based on the given direction.
 
-    return current_position
+    Args:
+        current_position (Coordinates): The current position of the robot.
+        direction (Coordinates): The direction to move (change in coordinates).
+
+    Returns:
+        Coordinates: The new position of the robot.
+
+    Example:
+    >>> update_position([0, 0], [1, 0])
+    [1, 0]
+    """
+
+    new_position = [
+        current_position[0] + direction[0],
+        current_position[1] + direction[1],
+    ]
+    return new_position

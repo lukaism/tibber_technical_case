@@ -27,6 +27,26 @@ VALUES (%s, %s, %s, %s) RETURNING id, "Timestamp", "Commands", "Result", "Durati
 
 
 def save_result(record: ExecutionResult):
+    """
+    Saves the execution result to the PostgreSQL database.
+
+    Args:
+        record (ExecutionResult): A dictionary containing timestamp, commands,
+            result, and duration of execution.
+
+    Returns:
+        tuple: A tuple containing a response dictionary and an HTTP status code.
+
+    Example:
+    >>> save_result({
+    ...     "timestamp": "2024-01-05T12:34:56",
+    ...     "commands": 10,
+    ...     "result": 42,
+    ...     "duration": 1.5,
+    ... })
+    ({'id': 101, 'Timestamp': '2024-01-05T12:34:56', 'Commands': 10, 'Result': 42, 'Duration': 1.5, 'message': 'Record inserted successfully.'}, 201)
+    """
+
     try:
         with connection:
             with connection.cursor() as cursor:

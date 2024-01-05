@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from robot_service import *
+from robot_service import parse_body_instruct_robot_generate_response
 from custom_types import ExecutionResult
 from record_service import save_result
 
