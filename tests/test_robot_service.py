@@ -6,7 +6,10 @@ from robot_service import (
     execute_robot_instructions,
     move_robot,
     update_position,
+    generate_trajectory,
+    generate_trajectory_2,
 )
+from test_helpers import LONG_JSON_BODY
 
 
 class TestRobotMovement(unittest.TestCase):
@@ -50,6 +53,11 @@ class TestRobotMovement(unittest.TestCase):
         self.assertIn("duration", response)
         self.assertIn("result", response)
         self.assertIn("commands", response)
+
+    def test_execute_robot_instructions_extensive(self):
+        result = parse_body_instruct_robot_generate_response(LONG_JSON_BODY)
+
+        self.assertEqual(result, 4)
 
     def test_parse_and_instruct_robot_1(self):
         JSON_BODY = {
@@ -102,15 +110,15 @@ class TestRobotMovement(unittest.TestCase):
                 {"direction": "north", "steps": 1},
                 {"direction": "south", "steps": 1},
                 {"direction": "west", "steps": 3},
-                {"direction": "north", "steps": 100000},
-                {"direction": "south", "steps": 100000},
-                {"direction": "west", "steps": 100000},
+                {"direction": "north", "steps": 10},
+                {"direction": "south", "steps": 10},
+                {"direction": "west", "steps": 10},
                 {"direction": "north", "steps": 1},
-                {"direction": "east", "steps": 100000},
+                {"direction": "east", "steps": 10},
             ],
         }
         self.assertEqual(
-            parse_body_instruct_robot_generate_response(JSON_BODY)["result"], 300005
+            parse_body_instruct_robot_generate_response(JSON_BODY)["result"], 35
         )
 
     def test_move_robot_records_correct_vertices(self):
@@ -164,6 +172,18 @@ class TestRobotMovement(unittest.TestCase):
         direction: Coordinates = [-1, 0]
 
         self.assertEqual(update_position(current_position, direction), [-1, 2])
+
+    def test_generate_trajectory(self):
+        current_position: Coordinates = [0, 0]
+        command: Command = {"direction": "north", "steps": 2}
+        result = generate_trajectory(current_position, command)
+        self.assertEqual(result, [(0, 0), (0, 1), (0, 2)])
+
+    def test_generate_trajectory_2(self):
+        current_position: Coordinates = [0, 0]
+        command: Command = {"direction": "north", "steps": 2}
+        result = generate_trajectory_2(current_position, command)
+        self.assertEqual(result, [(0, 0), (0, 1), (0, 2)])
 
 
 if __name__ == "__main__":

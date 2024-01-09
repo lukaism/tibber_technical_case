@@ -2,6 +2,7 @@ from typing import Dict, Tuple, Union
 import time
 from datetime import datetime
 from custom_types import Coordinates, Command, CommandsList, ExecutionResult
+import sys
 
 
 DIRECTION_CHANGES: Dict[str, Coordinates] = {
@@ -91,13 +92,15 @@ def execute_robot_instructions(
     >>> execute_robot_instructions([0, 0], [{"direction": "east", "steps": 2}])
     3
     """
-
     visited_vertices = set()
     visited_vertices.add(tuple(start_position))
     current_position = start_position
-
+    i = 0
     for command in commands:
+        i += 1
+        print(i)
         move_robot(visited_vertices, current_position, command)
+        print(sys.getsizeof(visited_vertices))
 
     return len(visited_vertices)
 
@@ -129,8 +132,83 @@ def update_position(
     [1, 0]
     """
 
-    new_position = [
-        current_position[0] + direction[0],
-        current_position[1] + direction[1],
-    ]
-    return new_position
+    current_position[0] = current_position[0] + direction[0]
+    current_position[1] = current_position[1] + direction[1]
+
+    return current_position
+
+
+def move_robot_2(
+    visited_vertices: set, current_position: Coordinates, command: Command
+) -> None:
+    trajectory = generate_trajectory_2(current_position, command)
+    visited_vertices.update(trajectory)
+    return trajectory
+
+
+def generate_trajectory(current_position: Coordinates, command: Command):
+    array_of_coordinates = []
+
+    if command["direction"] == "east":
+        array_of_coordinates = [
+            (x, current_position[1])
+            for x in range(
+                current_position[0], current_position[0] + command["steps"] + 1, 1
+            )
+        ]
+    elif command["direction"] == "west":
+        array_of_coordinates = [
+            (x, current_position[1])
+            for x in range(
+                current_position[0], current_position[0] - command["steps"] - 1, -1
+            )
+        ]
+    elif command["direction"] == "north":
+        array_of_coordinates = [
+            (current_position[0], y)
+            for y in range(
+                current_position[1], current_position[1] + command["steps"] + 1, 1
+            )
+        ]
+    elif command["direction"] == "south":
+        array_of_coordinates = [
+            (current_position[0], y)
+            for y in range(
+                current_position[1], current_position[1] - command["steps"] - 1, -1
+            )
+        ]
+
+    return array_of_coordinates
+
+
+def generate_trajectory_2(current_position: Coordinates, command: Command):
+    if command["direction"] == "east":
+        values_x = list(
+            range(current_position[0], current_position[0] + command["steps"] + 1)
+        )
+        values_y = [current_position[1]] * (command["steps"] + 1)
+        current_position[0] = current_position[0] + command["steps"]
+        array_of_coordinates = list(zip(values_x, values_y))
+    elif command["direction"] == "west":
+        values_x = list(
+            range(current_position[0], current_position[0] - command["steps"] - 1, -1)
+        )
+        values_y = [current_position[1]] * (command["steps"] + 1)
+        current_position[0] = current_position[0] - command["steps"]
+        array_of_coordinates = list(zip(values_x, values_y))
+    elif command["direction"] == "north":
+        values_y = list(
+            range(current_position[1], current_position[1] + command["steps"] + 1)
+        )
+        values_x = [current_position[0]] * (command["steps"] + 1)
+        current_position[1] = current_position[1] + command["steps"]
+        array_of_coordinates = list(zip(values_x, values_y))
+    elif command["direction"] == "south":
+        values_y = list(
+            range(current_position[1], current_position[1] - command["steps"] - 1, -1)
+        )
+        values_x = [current_position[0]] * (command["steps"] + 1)
+        current_position[1] = current_position[1] - command["steps"]
+        array_of_coordinates = list(zip(values_x, values_y))
+
+    return array_of_coordinates
