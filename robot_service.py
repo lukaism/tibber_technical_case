@@ -97,11 +97,7 @@ def execute_robot_instructions(
     current_position = start_position
     i = 0
     for command in commands:
-        i += 1
-        print(i)
         move_robot(visited_vertices, current_position, command)
-        print(sys.getsizeof(visited_vertices))
-
     return len(visited_vertices)
 
 
